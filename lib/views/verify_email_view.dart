@@ -22,25 +22,59 @@ class _VerifyEmailViewState extends State<VerifyEmailView> {
         ), //No shadow
       ),
       body: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          const Text(
-              "We've sent you an email verificaiton. Please open it to verify your account. "),
-          const Text(
-              "If you haven't recieced the email verificaiton yet , press the button below."),
-          TextButton(
-            onPressed: () async {
-              await AuthService.firebase().sendEmailVerification();
-            },
-            child: const Text('Send Email Verification'),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 500.0),
+            child: Column(
+              children: [
+                SizedBox(height: 15),
+                const Text(
+                    "We've sent you an email verificaiton. Please open it to verify your account. "),
+                const Text(
+                    "If you haven't recieced the email verificaiton yet , press the button below."),
+                SizedBox(height: 15),
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 25.0),
+                  child: Container(
+                    padding: EdgeInsets.symmetric(horizontal: 75.0),
+                    decoration: BoxDecoration(
+                      color: Colors.yellow,
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: Container(
+                      child: TextButton(
+                        onPressed: () async {
+                          await AuthService.firebase().sendEmailVerification();
+                        },
+                        child: const Text('Send Email Verification'),
+                      ),
+                    ),
+                  ),
+                ),
+                SizedBox(height: 15),
+                Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 25.0),
+                    child: Container(
+                      padding: EdgeInsets.symmetric(horizontal: 75.0),
+                      decoration: BoxDecoration(
+                        color: Colors.yellow,
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: Container(
+                        child: TextButton(
+                          onPressed: () async {
+                            await AuthService.firebase().logOut();
+                            Navigator.of(context).pushNamedAndRemoveUntil(
+                                registerRoute, (route) => false);
+                          },
+                          child: const Text('Restart'),
+                        ),
+                      ),
+                    )),
+              ],
+            ),
           ),
-          TextButton(
-            onPressed: () async {
-              await AuthService.firebase().logOut();
-              Navigator.of(context)
-                  .pushNamedAndRemoveUntil(registerRoute, (route) => false);
-            },
-            child: const Text('Restart'),
-          )
         ],
       ),
     );

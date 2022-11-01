@@ -35,70 +35,129 @@ class _RegisterViewState extends State<RegisterView> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Register'),
-      ),
+      backgroundColor: Colors.white,
       body: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          TextField(
-            decoration: const InputDecoration(
-              hintText: "Enter your email here",
+          SizedBox(height: 25),
+          Text('Sign Up',
+              style: TextStyle(
+                fontWeight: FontWeight.bold,
+                fontSize: 24,
+              )),
+          SizedBox(height: 10),
+          Text('It Only Takes A Minute',
+              style: TextStyle(
+                fontWeight: FontWeight.bold,
+                fontSize: 20,
+              )),
+          SizedBox(height: 25),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 25.0),
+            child: Container(
+              decoration: BoxDecoration(
+                color: Colors.grey[200],
+                border: Border.all(color: Colors.white),
+                borderRadius: BorderRadius.circular(15),
+              ),
+              child: Padding(
+                padding: const EdgeInsets.only(left: 20.0),
+                child: TextField(
+                  decoration: const InputDecoration(
+                    hintText: "Email Address",
+                    border: InputBorder.none,
+                  ),
+                  enableSuggestions: false,
+                  autocorrect: false,
+                  keyboardType: TextInputType.emailAddress,
+                  controller: _email,
+                ),
+              ),
             ),
-            enableSuggestions: false,
-            autocorrect: false,
-            keyboardType: TextInputType.emailAddress,
-            controller: _email,
           ),
-          TextField(
-            decoration: const InputDecoration(
-              hintText: "Enter your password here",
+          SizedBox(height: 15),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 25.0),
+            child: Container(
+              decoration: BoxDecoration(
+                color: Colors.grey[200],
+                border: Border.all(color: Colors.white),
+                borderRadius: BorderRadius.circular(15),
+              ),
+              child: Padding(
+                padding: const EdgeInsets.only(left: 20.0),
+                child: TextField(
+                  decoration: const InputDecoration(
+                    hintText: "Password",
+                    border: InputBorder.none,
+                  ),
+                  obscureText: true,
+                  enableSuggestions: false,
+                  autocorrect: false,
+                  controller: _password,
+                ),
+              ),
             ),
-            obscureText: true,
-            enableSuggestions: false,
-            autocorrect: false,
-            controller: _password,
           ),
+          SizedBox(height: 15),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 25.0),
+            child: Container(
+              padding: EdgeInsets.symmetric(horizontal: 75.0),
+              decoration: BoxDecoration(
+                color: Colors.yellow,
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: Container(
+                child: TextButton(
+                  onPressed: () async {
+                    final email = _email.text;
+                    final password = _password.text;
+                    try {
+                      await AuthService.firebase().createUser(
+                        email: email,
+                        password: password,
+                      );
+                      AuthService.firebase().sendEmailVerification();
+                      Navigator.of(context).pushNamed(verifyEmailRoute);
+                    } on WrongPasswordAuthException {
+                      await showErrorDialog(
+                        context,
+                        "Weak Password",
+                      );
+                    } on EmailAlreadyInUseAuthException {
+                      await showErrorDialog(
+                        context,
+                        "Wrong Credentials",
+                      );
+                    } on InvalidEmailAuthException {
+                      await showErrorDialog(
+                        context,
+                        "Invalid Email",
+                      );
+                    } on GenericAuthException {
+                      await showErrorDialog(
+                        context,
+                        "Failed to register",
+                      );
+                    }
+                  },
+                  child: const Text('Register'),
+                ),
+              ),
+            ),
+          ),
+          SizedBox(height: 15),
           TextButton(
-            onPressed: () async {
-              final email = _email.text;
-              final password = _password.text;
-              try {
-                await AuthService.firebase().createUser(
-                  email: email,
-                  password: password,
-                );
-                AuthService.firebase().sendEmailVerification();
-                Navigator.of(context).pushNamed(verifyEmailRoute);
-              } on WrongPasswordAuthException {
-                await showErrorDialog(
-                  context,
-                  "Weak Password",
-                );
-              } on EmailAlreadyInUseAuthException {
-                await showErrorDialog(
-                  context,
-                  "Wrong Credentials",
-                );
-              } on InvalidEmailAuthException {
-                await showErrorDialog(
-                  context,
-                  "Invalid Email",
-                );
-              } on GenericAuthException {
-                await showErrorDialog(
-                  context,
-                  "Failed to register",
-                );
-              }
+            onPressed: () {
+              Navigator.of(context)
+                  .pushNamedAndRemoveUntil(loginRoute, (route) => false);
             },
-            child: const Text('Register'),
+            child: Text('Already registered? Login Here',
+                style: TextStyle(
+                  color: Colors.grey,
+                )),
           ),
-          TextButton(
-              onPressed: () {
-                Navigator.of(context)
-                    .pushNamedAndRemoveUntil(loginRoute, (route) => false);
-              },
-              child: Text('Already registered, login here.'))
         ],
       ),
     );
